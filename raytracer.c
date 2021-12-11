@@ -2,8 +2,9 @@
 #include "typedef.h"
 #include "raymath.h"
 #include <stdbool.h>
-#include <semaphore.h>
 #include <pthread.h>
+//#include <semaphore.h>
+
 
 int thread_cal(int height, int thread_num)
 {
@@ -175,13 +176,22 @@ void raycal(void *ptr)
             data->imgdata[(x + y * WIDTH) * 3 + 1] = (unsigned char)min(green * 255.0f, 255.0f);
             data->imgdata[(x + y * WIDTH) * 3 + 2] = (unsigned char)min(blue * 255.0f, 255.0f);
 
+            /* Lock (Increament the lock value), if already locked this thread goes to blocked state */
+            pthread_mutex_lock(data->mutex);
+            /* critical section - counter for sub-pixels */
+            *data->count += 3;
+            /* Unlock (Decreament the lock value.) */
+            pthread_mutex_unlock(data->mutex);            
+
+
+            /* Using Semaphore */
             /* wait / DOWN */
-            sem_wait(data->mutex);
+            //sem_wait(data->mutex);
             /* critical section*/
             /* counter for how many sub-pixels are calculated*/
-            (*data->count) += 3;
+            //*data->count += 3;
             /* signal / UP */
-            sem_post(data->mutex);
+            //sem_post(data->mutex);
         }
     }
     pthread_exit(0);

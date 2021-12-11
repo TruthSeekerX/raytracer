@@ -4,12 +4,11 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <string.h>
-#include <semaphore.h>
 #include "raytracer.h"
 #include "fileio.h"
 #include "raymath.h"
 #include "typedef.h"
-
+//#include <semaphore.h>
 
 
 int main(int argc, char *argv[])
@@ -25,14 +24,23 @@ int main(int argc, char *argv[])
 
     tdata data[THREAD_NUM];
     pthread_t threads[THREAD_NUM];
+    pthread_mutex_t mutex;
 
-    /* initialise binary semaphore */
-    sem_t mutex;
-    if (sem_init(&mutex, 0, 1) != 0)
-    {
-        printf("Error! Semaphore initializtion failed.\n");
+    /* initialise mutex */
+    if(pthread_mutex_init(&mutex, NULL) != 0){
+        printf("Error! Mutex Lock initialization failed.\n");
         return 1;
     }
+
+
+    /* initialise binary semaphore */
+/*    sem_t mutex;
+    if (sem_init(&mutex, 0, 1) != 0)
+    {
+        printf("Error! Semaphore initialization failed.\n");
+        return 1;
+    }
+*/
 
     /* create threads */
     for (int i = 0; i < THREAD_NUM; i++)
@@ -60,7 +68,8 @@ int main(int argc, char *argv[])
         pthread_join(threads[i], NULL);
     }
 
-    sem_destroy(&mutex);
+    pthread_mutex_destroy(&mutex);
+//    sem_destroy(&mutex);
     saveppm("raytrace_threads.ppm", imgdata, WIDTH, HEIGHT);
     printf("height=%d, width=%d\n", HEIGHT, WIDTH);
     printf("Number of sub-pixels counted are:%u\n(pixel count=%u)\n", count, count / 3);

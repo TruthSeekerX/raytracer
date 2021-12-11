@@ -4,7 +4,9 @@
 #define min(a, b) (((a) < (b)) ? (a) : (b))
 
 #include <stdint.h>
-#include <semaphore.h>
+#include <pthread.h>
+
+//#include <semaphore.h>
 /* Width and height of out image */
 #define WIDTH 2000
 #define HEIGHT 1000
@@ -61,7 +63,8 @@ typedef struct
     uint16_t cols_start;
     uint32_t index;
     uint32_t *count;
-    sem_t *mutex;
+    pthread_mutex_t *mutex;
+//    sem_t *mutex;
 } tdata;
 
 #endif
